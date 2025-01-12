@@ -10,7 +10,15 @@ include_directories(external/spdlog/include)
 add_subdirectory(external/json)
 include_directories(external/json/include)
 
-add_executable(arcade-terminal src/main.cpp src/arcade.cpp src/config.cpp src/log.cpp)
+add_executable(arcade-terminal 
+                src/main.cpp 
+                src/arcade.cpp 
+                src/config.cpp 
+                src/log.cpp
+                src/screen.cpp
+                src/game.cpp
+                games/Labyrinth.cpp)
+
 target_include_directories(arcade-terminal PRIVATE inc/)
 
 target_link_libraries(arcade-terminal PRIVATE spdlog::spdlog)

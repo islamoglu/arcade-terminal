@@ -21,7 +21,7 @@ private:
 
 #define LOG(level, fmt, ...)                            \
     {                                                   \
-        if (LogManager::get_log_level() >= level)       \
+        if (LogManager::get_log_level() <= level)       \
             LogManager::log(level, fmt, ##__VA_ARGS__); \
     }
 
