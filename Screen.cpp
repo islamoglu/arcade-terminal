@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <memory>
-#include <ncurses.h>
+#include <curses.h>
 
 class TerminalScreen : public Screen
 {

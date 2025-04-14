@@ -13,7 +13,8 @@ ExternalProject_Add(
 )
 
 # Tell CMake where to find the built libraries/headers
-include_directories(${CMAKE_BINARY_DIR}/ncurses-install/include)
+include_directories(${CMAKE_BINARY_DIR}/ncurses-install/include/ncursesw)
+include_directories(${CMAKE_BINARY_DIR}/ncurses-install/include/)
 link_directories(${CMAKE_BINARY_DIR}/ncurses-install/lib)
 
 # Your arcade executable
@@ -23,4 +24,9 @@ add_executable(arcade Arcade.cpp Log.cpp Config.cpp User.cpp Screen.cpp)
 add_dependencies(arcade ncurses_project)
 
 # Link with ncurses
-target_link_libraries(arcade PRIVATE ncurses)
+target_link_libraries(arcade PRIVATE ncursesw)
+target_link_libraries(arcade PRIVATE ncurses++w)
+target_link_libraries(arcade PRIVATE tinfow)
+target_link_libraries(arcade PRIVATE panelw)
+target_link_libraries(arcade PRIVATE menuw)
+target_link_libraries(arcade PRIVATE formw)
