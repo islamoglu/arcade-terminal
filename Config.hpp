@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
+#include <functional>
+#include <memory>
 
 class Config
 {
@@ -10,12 +13,12 @@ public:
     virtual const std::string &getValue(const char *key) = 0;
 };
 
-class ConfigManager
+class ConfigFactory
 {
 private:
-    static Config *config;
+    static std::unordered_map<std::string, std::function<std::unique_ptr<Config>()>> *configCreators;
 
 public:
-    static Config &buildConfig(int argc, char *argv[]);
-    static Config &getConfig();
+    static void registerConfigCreator(std::string type, std::function<std::unique_ptr<Config>()> creator);
+    static std::unique_ptr<Config> createConfig(int argc, char *argv[]);
 };

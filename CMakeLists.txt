@@ -18,7 +18,8 @@ include_directories(${CMAKE_BINARY_DIR}/ncurses-install/include/)
 link_directories(${CMAKE_BINARY_DIR}/ncurses-install/lib)
 
 # Your arcade executable
-add_executable(arcade Arcade.cpp Log.cpp Config.cpp User.cpp Screen.cpp)
+#TODO file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/*.cpp")
+add_executable(arcade Arcade.cpp Config.cpp DefaultConfig.cpp FileLogger.cpp LocalUser.cpp Logger.cpp Screen.cpp TerminalScreen.cpp User.cpp)
 
 # Make sure arcade waits for ncurses to finish building
 add_dependencies(arcade ncurses_project)

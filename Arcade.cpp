@@ -1,19 +1,29 @@
 #include "Config.hpp"
-#include "Log.hpp"
+#include "Logger.hpp"
 #include "User.hpp"
+#include "Screen.hpp"
 #include <iostream>
 #include <string>
+#include <unordered_map>
+#include <functional>
+#include <memory>
 
 int main(int argc, char *argv[])
 {
     try
     {
-        ConfigManager::buildConfig(argc, argv);
-        Logger &logger = LogManager::buildLogger();
-        logger.log("Starting program");
+        std::unique_ptr<Config> config = ConfigFactory::createConfig(argc, argv);
+        std::unique_ptr<Logger> logger = LoggerFactory::createLogger(config);
+        logger->log("Starting program");
+
+        // Display intro
+        std::unique_ptr<Screen> screen = ScreenFactory::createScreen(config);
+        screen->displayIntro();
 
         // Get user info
-        User *user = UserManager::getUser();
+        std::unique_ptr<User> user = UserFactory::createUser(config);
+        user->getUserInfo(screen);
+        logger->log("User: " + user->getName());
 
         // Select game
 

@@ -1,88 +1,21 @@
 #include "Screen.hpp"
 #include "Config.hpp"
-#include <string>
-#include <string.h>
-#include <stdexcept>
-#include <iostream>
-#include <memory>
-#include <curses.h>
+#include <functional>
 
-class TerminalScreen : public Screen
+std::unordered_map<std::string, std::function<std::unique_ptr<Screen>()>> *ScreenFactory::screenCreators = nullptr;
+
+void ScreenFactory::registerScreenCreator(std::string type, std::function<std::unique_ptr<Screen>()> creator)
 {
-public:
-    TerminalScreen()
+    if (screenCreators == nullptr)
     {
-        initscr();            // Start ncurses mode
-        cbreak();             // Disable line buffering
-        noecho();             // Don't echo() while we do getch
-        keypad(stdscr, TRUE); // Enable F1, arrow keys, etc.
+        screenCreators = new std::unordered_map<std::string, std::function<std::unique_ptr<Screen>()>>();
     }
-
-    ~TerminalScreen() override
-    {
-        endwin();
-    }
-
-    void render() override
-    {
-        refresh();
-    }
-
-    void clean() override
-    {
-        clear();
-    }
-
-    std::string readInput(const char *title) override
-    {
-        echo();
-        char input[256];
-        int x = (COLS - strlen(title)) / 2;
-        int y = LINES / 2 - 1;
-        mvprintw(y, x, "%s :", title);
-        mvprintw(y + 2, x, "Press enter to save ...");
-        mvprintw(y + 1, x, ">> ");
-        refresh();
-        getstr(input);
-        noecho();
-        clear();
-        return std::string(input);
-    }
-};
-
-std::unique_ptr<Screen> ScreenManager::screen = nullptr;
-
-Screen &ScreenManager::buildScreen()
-{
-    if (screen.get() != nullptr)
-    {
-        delete screen.get();
-    }
-
-    std::string screenType = ConfigManager::getConfig().getValue("screenType");
-    if (screenType == "terminal")
-    {
-        screen = std::make_unique<TerminalScreen>();
-    }
-    else
-    {
-        throw std::runtime_error("Unknown screen type: " + screenType);
-    }
-
-    if (screen == nullptr)
-    {
-        throw std::runtime_error("Failed to create screen");
-    }
-
-    return *screen.get();
+    screenCreators->insert({type, creator});
 }
 
-Screen &ScreenManager::getScreen()
+std::unique_ptr<Screen> ScreenFactory::createScreen(std::unique_ptr<Config> &config)
 {
-    if (screen == nullptr)
-    {
-        buildScreen();
-    }
-
-    return *screen;
+    std::string screenType = config->getValue("screenType");
+    std::function<std::unique_ptr<Screen>()> creator = screenCreators->at(screenType);
+    return creator();
 }

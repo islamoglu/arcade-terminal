@@ -1,57 +1,28 @@
 #include "Config.hpp"
 #include <unordered_map>
 #include <stdexcept>
+#include <functional>
+#include <memory>
 
-class DefaultConfig : public Config
+std::unordered_map<std::string, std::function<std::unique_ptr<Config>()>> *ConfigFactory::configCreators = nullptr;
+
+void ConfigFactory::registerConfigCreator(std::string type, std::function<std::unique_ptr<Config>()> creator)
 {
-private:
-    std::unordered_map<std::string, std::string> defaultValues = {
-        {"loggerType", "file"},
-        {"userType", "terminal"},
-        {"screenType", "terminal"}};
-
-public:
-    const std::string &getValue(std::string &key) override
+    if (configCreators == nullptr)
     {
-        return defaultValues.at(key);
+        configCreators = new std::unordered_map<std::string, std::function<std::unique_ptr<Config>()>>();
     }
-    const std::string &getValue(const char *key) override
-    {
-        return defaultValues.at(key);
-    }
-};
-
-Config *ConfigManager::config = nullptr;
-
-Config &ConfigManager::buildConfig(int argc, char *argv[])
-{
-    if (config != nullptr)
-    {
-        delete config;
-        config = nullptr;
-    }
-
-    config = new DefaultConfig();
-
-    if (config == nullptr)
-    {
-        throw std::runtime_error("Failed to create config");
-    }
-
-    return *config;
+    configCreators->insert({type, creator});
 }
 
-Config &ConfigManager::getConfig()
+std::unique_ptr<Config> ConfigFactory::createConfig(int argc, char *argv[])
 {
-    if (config == nullptr)
+    std::string configType = "default";
+    if (argv[1] != nullptr)
     {
-        config = new DefaultConfig();
-
-        if (config == nullptr)
-        {
-            throw std::runtime_error("Failed to create config");
-        }
+        configType = argv[1];
     }
 
-    return *config;
+    std::function<std::unique_ptr<Config>()> creator = configCreators->at(configType);
+    return creator();
 }

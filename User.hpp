@@ -1,20 +1,24 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
+#include <functional>
+#include "Config.hpp"
+#include "Screen.hpp"
 
 class User
 {
-private:
-    std::string name;
-
 public:
-    User(std::string &name) { this->name = name; }
-    void setName(std::string &name) { this->name = name; }
-    std::string &getName() { return name; }
+    virtual std::string &getName() = 0;
+    virtual void getUserInfo(std::unique_ptr<Screen> &screen) = 0;
 };
 
-class UserManager
+class UserFactory
 {
+private:
+    static std::unordered_map<std::string, std::function<std::unique_ptr<User>()>> *userCreators;
+
 public:
-    static User *getUser();
+    static void registerUserCreator(std::string type, std::function<std::unique_ptr<User>()> creator);
+    static std::unique_ptr<User> createUser(std::unique_ptr<Config> &config);
 };

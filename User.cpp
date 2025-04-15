@@ -1,41 +1,23 @@
 #include "User.hpp"
 #include "Screen.hpp"
 #include "Config.hpp"
-#include "Log.hpp"
 #include <stdexcept>
 #include <memory>
 
-class UserReader
+std::unordered_map<std::string, std::function<std::unique_ptr<User>()>> *UserFactory::userCreators = nullptr;
+
+void UserFactory::registerUserCreator(std::string type, std::function<std::unique_ptr<User>()> creator)
 {
-public:
-    virtual User *readUser() = 0;
-};
+    if (userCreators == nullptr)
+    {
+        userCreators = new std::unordered_map<std::string, std::function<std::unique_ptr<User>()>>();
+    }
+    userCreators->insert({type, creator});
+}
 
-class TerminalUserReader : public UserReader
+std::unique_ptr<User> UserFactory::createUser(std::unique_ptr<Config> &config)
 {
-public:
-    User *readUser() override
-    {
-        Screen &screen = ScreenManager::getScreen();
-        std::string username = screen.readInput("Username");
-        screen.clean();
-        return new User(username);
-    }
-};
-
-User *UserManager::getUser()
-{
-    std::unique_ptr<UserReader> reader;
-
-    const std::string &userType = ConfigManager::getConfig().getValue("userType");
-    if (userType == "terminal")
-    {
-        reader = std::make_unique<TerminalUserReader>();
-    }
-    else
-    {
-        throw std::runtime_error("Unknown user type: " + userType);
-    }
-
-    return reader->readUser();
+    std::string userType = config->getValue("userType");
+    std::function<std::unique_ptr<User>()> creator = userCreators->at(userType);
+    return creator();
 }
