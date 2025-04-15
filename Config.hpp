@@ -13,6 +13,16 @@ public:
     virtual const std::string &getValue(const char *key) = 0;
 };
 
+class Configurable
+{
+public:
+    static void setConfig(std::unique_ptr<Config> value) { config = std::move(value); };
+    static std::unique_ptr<Config> &getConfig() { return config; };
+
+private:
+    static std::unique_ptr<Config> config;
+};
+
 class ConfigFactory
 {
 private:

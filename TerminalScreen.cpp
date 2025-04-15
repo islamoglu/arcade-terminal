@@ -1,5 +1,6 @@
 #include "Screen.hpp"
 #include "Config.hpp"
+#include "Logger.hpp"
 #include <string>
 #include <string.h>
 #include <stdexcept>
@@ -7,15 +8,17 @@
 #include <memory>
 #include <curses.h>
 
-class TerminalScreen : public Screen
+class TerminalScreen : public Screen, Loggable
 {
 public:
     TerminalScreen()
     {
-        initscr();            // Start ncurses mode
-        cbreak();             // Disable line buffering
-        noecho();             // Don't echo() while we do getch
+        initscr(); // Start ncurses mode
+        cbreak();  // Disable line buffering
+        noecho();  // Don't echo() while we do getch
+        // nodelay(stdscr, TRUE); // Make getch() non-blocking
         keypad(stdscr, TRUE); // Enable F1, arrow keys, etc.
+        start_color();
     }
 
     ~TerminalScreen() override
@@ -51,37 +54,65 @@ public:
 
     void displayIntro() override
     {
-        const char *frames[] = {
-            "  _______    _______  _______  _______  _______  ",
-            " |       |  |       ||       ||       ||       | ",
-            " |  __   |  |   _   ||   _   ||   _   ||   _   | ",
-            " | /  \\  |  |  | |  ||  | |  ||  | |  ||  | |  | ",
-            " | |  | |  |  | |  ||  |_|  ||  |_|  ||  |_|  | ",
-            " | |__| |  |  |_|  ||       ||       ||       | ",
-            " |_______|  |_______||_______||_______||_______| ",
-            "                                        ",
-            "                                        ",
-            "                                        ",
-            "                                        ",
-            "                                        ",
-            "                                        ",
-            "                                        ",
-            "                                        ",
-            "                                        ",
+        init_pair(1, COLOR_GREEN, COLOR_BLACK);
+        attron(COLOR_PAIR(1));
+        // welcome
+
+        // name
+        const char *arcade[]{
+
+            "    _     ____    ____     _     ____   _____ ",
+            "   / \\   |  _ \\  / ___|   / \\   |  _ \\ | ____|",
+            "  / _ \\  | |_) || |      / _ \\  | | | ||  _|  ",
+            " / ___ \\ |  _ < | |___  / ___ \\ | |_| || |___ ",
+            "/_/   \\_\\|_| \\_\\ \\____|/_/   \\_\\|____/ |_____|"
+
         };
-        const int num_frames = sizeof(frames) / sizeof(frames[0]);
+
+        const char *terminal[]{
+            " _____  _____  ____   __  __  ___  _   _     _     _     ",
+            "|_   _|| ____||  _ \\ |  \\/  ||_ _|| \\ | |   / \\   | |    ",
+            "  | |  |  _|  | |_) || |\\/| | | | |  \\| |  / _ \\  | |    ",
+            "  | |  | |___ |  _ < | |  | | | | | |\\  | / ___ \\ | |___ ",
+            "  |_|  |_____||_| \\_\\|_|  |_||___||_| \\_|/_/   \\_\\|_____|"
+
+        };
+
+        getLogger()->log(std::to_string(sizeof(arcade)));
+        getLogger()->log(std::to_string(sizeof(arcade[0])));
+
+        const int arcade_frame = sizeof(arcade) / sizeof(arcade[0]);
+        const int arcade_char = sizeof(arcade[0]);
+        const int terminal_frame = sizeof(terminal) / sizeof(terminal[0]);
+        const int terminal_char = sizeof(terminal[0]);
+
         int frame = 0;
-        int y = LINES / 2 - 1;
+        int y = LINES / 2 - arcade_frame / 2;
+        int x = COLS;
         while (true)
         {
-            if (frame == 0)
-                clear();
-            int x = COLS - strlen(frames[frame]);
-            mvprintw(y, x, frames[frame]);
+            mvprintw(y, x, arcade[frame]);
             refresh();
-            frame = (frame + 1) % num_frames;
-            napms(100);
+            frame++;
+            y++;
+            if (frame == arcade_frame)
+            {
+                frame = 0;
+                y = LINES / 2 - arcade_frame / 2;
+                x--;
+                if (x == (COLS - 46) / 2)
+                {
+                    break;
+                }
+                napms(25);
+                clear();
+            }
         }
+        // press enter
+        getch();
+
+        attroff(COLOR_PAIR(1));
+        clear();
     }
 };
 

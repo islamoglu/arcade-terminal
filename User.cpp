@@ -15,9 +15,9 @@ void UserFactory::registerUserCreator(std::string type, std::function<std::uniqu
     userCreators->insert({type, creator});
 }
 
-std::unique_ptr<User> UserFactory::createUser(std::unique_ptr<Config> &config)
+std::unique_ptr<User> UserFactory::createUser()
 {
-    std::string userType = config->getValue("userType");
+    std::string userType = getConfig()->getValue("userType");
     std::function<std::unique_ptr<User>()> creator = userCreators->at(userType);
     return creator();
 }

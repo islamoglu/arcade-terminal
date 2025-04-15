@@ -4,6 +4,8 @@
 #include <functional>
 #include <memory>
 
+std::unique_ptr<Config> Configurable::config = nullptr;
+
 std::unordered_map<std::string, std::function<std::unique_ptr<Config>()>> *ConfigFactory::configCreators = nullptr;
 
 void ConfigFactory::registerConfigCreator(std::string type, std::function<std::unique_ptr<Config>()> creator)

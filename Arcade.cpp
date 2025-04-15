@@ -13,17 +13,21 @@ int main(int argc, char *argv[])
     try
     {
         std::unique_ptr<Config> config = ConfigFactory::createConfig(argc, argv);
-        std::unique_ptr<Logger> logger = LoggerFactory::createLogger(config);
-        logger->log("Starting program");
+        Configurable::setConfig(std::move(config));
+
+        std::unique_ptr<Logger> logger = LoggerFactory::createLogger();
+        Loggable::setLogger(std::move(logger));
+
+        Loggable::getLogger()->log("Starting program");
 
         // Display intro
-        std::unique_ptr<Screen> screen = ScreenFactory::createScreen(config);
+        std::unique_ptr<Screen> screen = ScreenFactory::createScreen();
         screen->displayIntro();
 
         // Get user info
-        std::unique_ptr<User> user = UserFactory::createUser(config);
+        std::unique_ptr<User> user = UserFactory::createUser();
         user->getUserInfo(screen);
-        logger->log("User: " + user->getName());
+        Loggable::getLogger()->log("User: " + user->getName());
 
         // Select game
 

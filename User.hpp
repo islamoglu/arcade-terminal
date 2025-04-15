@@ -13,12 +13,12 @@ public:
     virtual void getUserInfo(std::unique_ptr<Screen> &screen) = 0;
 };
 
-class UserFactory
+class UserFactory : public Configurable
 {
 private:
     static std::unordered_map<std::string, std::function<std::unique_ptr<User>()>> *userCreators;
 
 public:
     static void registerUserCreator(std::string type, std::function<std::unique_ptr<User>()> creator);
-    static std::unique_ptr<User> createUser(std::unique_ptr<Config> &config);
+    static std::unique_ptr<User> createUser();
 };

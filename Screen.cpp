@@ -13,9 +13,9 @@ void ScreenFactory::registerScreenCreator(std::string type, std::function<std::u
     screenCreators->insert({type, creator});
 }
 
-std::unique_ptr<Screen> ScreenFactory::createScreen(std::unique_ptr<Config> &config)
+std::unique_ptr<Screen> ScreenFactory::createScreen()
 {
-    std::string screenType = config->getValue("screenType");
+    std::string screenType = getConfig()->getValue("screenType");
     std::function<std::unique_ptr<Screen>()> creator = screenCreators->at(screenType);
     return creator();
 }

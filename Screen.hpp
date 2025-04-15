@@ -14,12 +14,12 @@ public:
     virtual ~Screen() {}
 };
 
-class ScreenFactory
+class ScreenFactory : public Configurable
 {
 private:
     static std::unordered_map<std::string, std::function<std::unique_ptr<Screen>()>> *screenCreators;
 
 public:
     static void registerScreenCreator(std::string type, std::function<std::unique_ptr<Screen>()> creator);
-    static std::unique_ptr<Screen> createScreen(std::unique_ptr<Config> &config);
+    static std::unique_ptr<Screen> createScreen();
 };

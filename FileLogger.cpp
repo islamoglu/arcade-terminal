@@ -11,7 +11,7 @@ private:
 public:
     FileLogger(const std::string &filename) : filename(filename)
     {
-        file.open(filename, std::ios::out | std::ios::app);
+        file.open(filename, std::ios::out);
     }
 
     ~FileLogger()
