@@ -2,11 +2,53 @@
 #include "Logger.hpp"
 #include "User.hpp"
 #include "Screen.hpp"
+#include "Game.hpp"
 #include <iostream>
 #include <string>
 #include <unordered_map>
 #include <functional>
 #include <memory>
+#include <unistd.h>
+
+class Arcade : public Configurable, Loggable<LogModules::main>
+{
+private:
+    std::unique_ptr<Screen> screen;
+    std::unique_ptr<User> user;
+
+    void playMainIntro()
+    {
+        screen->clean();
+        screen->printStringCenterAligned(1, 50, "!!! Welcome !!!");
+        screen->printStringCenterAligned(80, 50, "Press enter to continue");
+        screen->printStringCenterAligned(95, 50, "Copyright 2025 Selahaddin Islamoglu, All rights reserved.");
+        screen->printStringCenterAligned(99, 50, "https://islamoglu.github.io/");
+        screen->render();
+        sleep(2);
+    }
+    void getUserInfo()
+    {
+        // user->getUserInfo(screen);
+    }
+
+public:
+    Arcade()
+    {
+        screen = ScreenFactory::createScreen();
+        user = UserFactory::createUser();
+    }
+    void run()
+    {
+        playMainIntro();
+        getUserInfo();
+
+        // Select game
+
+        // Start game
+
+        // Exit
+    }
+};
 
 int main(int argc, char *argv[])
 {
@@ -15,27 +57,8 @@ int main(int argc, char *argv[])
         std::unique_ptr<Config> config = ConfigFactory::createConfig(argc, argv);
         Configurable::setConfig(std::move(config));
 
-        std::unique_ptr<Logger> logger = LoggerFactory::createLogger();
-        Loggable::setLogger(std::move(logger));
-
-        Loggable::getLogger()->log("Starting program");
-
-        // Display intro
-        std::unique_ptr<Screen> screen = ScreenFactory::createScreen();
-        screen->displayIntro();
-
-        // Get user info
-        std::unique_ptr<User> user = UserFactory::createUser();
-        user->getUserInfo(screen);
-        Loggable::getLogger()->log("User: " + user->getName());
-
-        // Select game
-
-        // Start game
-
-        // Save results
-
-        // Exit
+        Arcade arcade;
+        arcade.run();
     }
     catch (const std::exception &e)
     {

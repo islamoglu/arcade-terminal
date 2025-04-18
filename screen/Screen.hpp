@@ -7,11 +7,12 @@
 class Screen
 {
 public:
+    virtual void printString(int y, int x, std::string text) = 0;
+    virtual void printStringCenterAligned(int y, int x, std::string text) = 0;
     virtual void render() = 0;
     virtual void clean() = 0;
     virtual std::string readInput(const char *title) = 0;
-    virtual void displayIntro() = 0;
-    virtual ~Screen() {}
+    virtual ~Screen() {};
 };
 
 class ScreenFactory : public Configurable

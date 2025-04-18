@@ -18,16 +18,29 @@ include_directories(${CMAKE_BINARY_DIR}/ncurses-install/include/)
 link_directories(${CMAKE_BINARY_DIR}/ncurses-install/lib)
 
 # Your arcade executable
-#TODO file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/*.cpp")
-add_executable(arcade Arcade.cpp Config.cpp DefaultConfig.cpp FileLogger.cpp LocalUser.cpp Logger.cpp Screen.cpp TerminalScreen.cpp User.cpp)
+file(GLOB_RECURSE CONFIG "config/*.cpp")
+file(GLOB_RECURSE GAME "game/*.cpp")
+file(GLOB_RECURSE LOGGING "logging/*.cpp")
+file(GLOB_RECURSE SCREEN "screen/*.cpp")
+file(GLOB_RECURSE USER "user/*.cpp")
+
+include_directories(${CMAKE_SOURCE_DIR}/config)
+include_directories(${CMAKE_SOURCE_DIR}/game)
+include_directories(${CMAKE_SOURCE_DIR}/logging)
+include_directories(${CMAKE_SOURCE_DIR}/screen)
+include_directories(${CMAKE_SOURCE_DIR}/user)
+
+add_executable(arcade Arcade.cpp ${CONFIG} ${GAME} ${LOGGING} ${SCREEN} ${USER})
 
 # Make sure arcade waits for ncurses to finish building
 add_dependencies(arcade ncurses_project)
 
 # Link with ncurses
-target_link_libraries(arcade PRIVATE ncursesw)
-target_link_libraries(arcade PRIVATE ncurses++w)
-target_link_libraries(arcade PRIVATE tinfow)
-target_link_libraries(arcade PRIVATE panelw)
-target_link_libraries(arcade PRIVATE menuw)
-target_link_libraries(arcade PRIVATE formw)
+target_link_libraries(arcade PRIVATE
+    ncurses++w
+    ncursesw
+    panelw
+    menuw
+    formw
+    tinfow
+)
