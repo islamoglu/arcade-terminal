@@ -59,6 +59,76 @@ public:
         printStringRaw(y, x, text, true);
     }
 
+    void printObjectRaw(int y, int x, const char **object, int object_y, int object_x, bool center)
+    {
+        double start_x = 0;
+        double start_y = 0;
+        double finish_x = object_x;
+        double finish_y = object_y;
+        double start_col = (double)COLS * x / 100 - (center ? (double)object_x / 2 : 0);
+        double start_row = (double)LINES * y / 100 - (center ? (double)object_y / 2 : 0);
+
+        if (start_col >= (double)COLS || start_row >= (double)LINES)
+            return;
+        if (start_col + (double)object_x < 0 || start_row + (double)object_y < 0)
+            return;
+
+        if (start_col < 0)
+        {
+            start_x = -start_col;
+            start_col = 0;
+        }
+        if (start_row < 0)
+        {
+            start_y = -start_row;
+            start_row = 0;
+        }
+
+        if (start_col + (double)object_x >= (double)COLS)
+        {
+            finish_x = (double)COLS - start_col;
+        }
+        if (start_row + object_y >= (double)LINES)
+        {
+            finish_y = (double)LINES - start_row;
+        }
+
+        for (int i = (int)start_y; i < (int)finish_y; i++)
+        {
+            mvprintw((int)start_row + i, (int)start_col, "%.*s", (int)finish_x + 1 - (int)start_x, object[i] + (int)start_x);
+        }
+    }
+
+    void printObject(int y, int x, const char **object, int object_y, int object_x) override
+    {
+        printObjectRaw(y, x, object, object_y, object_x, false);
+    }
+
+    void printObjectCenterAligned(int y, int x, const char **object, int object_y, int object_x) override
+    {
+        printObjectRaw(y, x, object, object_y, object_x, true);
+    }
+
+    void clearArea(int y, int x, int object_y, int object_x) override
+    {
+        int col = COLS * x / 100;
+        int row = LINES * y / 100;
+        for (int i = 0; i < object_y; i++)
+        {
+            mvprintw(row + i, col, "%s", std::string(object_x, ' ').c_str());
+        }
+    }
+
+    void clearAreaCenterAligned(int y, int x, int object_y, int object_x) override
+    {
+        double col = (double)COLS * (double)x / 100 - (double)object_x / 2;
+        double row = (double)LINES * (double)y / 100 - (double)object_y / 2;
+        for (int i = 0; i < object_y; i++)
+        {
+            mvprintw((int)row + i, (int)col, "%s", std::string(object_x, ' ').c_str());
+        }
+    }
+
     std::string readInput(const char *title) override
     {
         echo();
