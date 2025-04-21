@@ -7,8 +7,8 @@
 class Screen
 {
 public:
-    virtual void printString(int y, int x, std::string text) = 0;
-    virtual void printStringCenterAligned(int y, int x, std::string text) = 0;
+    virtual void printString(int y, int x, const char *text) = 0;
+    virtual void printStringCenterAligned(int y, int x, const char *text) = 0;
     virtual void printObject(int y, int x, const char **object, int object_y, int object_x) = 0;
     virtual void printObjectCenterAligned(int y, int x, const char **object, int object_y, int object_x) = 0;
     virtual void clearArea(int y, int x, int object_y, int object_x) = 0;
@@ -16,6 +16,7 @@ public:
     virtual void render() = 0;
     virtual void clean() = 0;
     virtual std::string readInput(const char *title) = 0;
+    virtual int readInputChar() = 0;
     virtual ~Screen() {};
 };
 

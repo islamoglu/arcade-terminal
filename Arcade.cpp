@@ -16,6 +16,7 @@ class Arcade : public Configurable, Loggable<LogModules::main>
 private:
     std::unique_ptr<Screen> screen;
     std::unique_ptr<User> user;
+    std::unique_ptr<Game> game;
 
     void playMainIntro()
     {
@@ -65,15 +66,21 @@ private:
             }
         }
         screen->printStringCenterAligned(0, 50, "!!! Welcome !!!");
-        screen->printStringCenterAligned(80, 50, "Press enter to continue");
+        screen->printStringCenterAligned(80, 50, "Press key to continue");
         screen->printStringCenterAligned(95, 50, "Copyright 2025 Selahaddin Islamoglu, All rights reserved.");
         screen->printStringCenterAligned(99, 50, "https://islamoglu.github.io/");
         screen->render();
-        sleep(20);
+        screen->readInputChar();
     }
+
     void getUserInfo()
     {
-        // user->getUserInfo(screen);
+        user->getUserInfo(screen);
+    }
+
+    std::unique_ptr<Game> &selectGame()
+    {
+        return GameRepository::chooseGame(screen);
     }
 
 public:
@@ -86,8 +93,7 @@ public:
     {
         playMainIntro();
         getUserInfo();
-
-        // Select game
+        selectGame();
 
         // Start game
 

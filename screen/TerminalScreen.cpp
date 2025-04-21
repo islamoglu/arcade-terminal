@@ -42,19 +42,19 @@ public:
         clear();
     }
 
-    void printStringRaw(int y, int x, std::string text, bool center)
+    void printStringRaw(int y, int x, const char *text, bool center)
     {
-        int col = COLS * x / 100 - (center ? text.length() / 2 : 0);
+        int col = COLS * x / 100 - (center ? strlen(text) / 2 : 0);
         int row = LINES * y / 100;
-        mvprintw(row, col, "%s", text.c_str());
+        mvprintw(row, col, "%s", text);
     }
 
-    void printString(int y, int x, std::string text) override
+    void printString(int y, int x, const char *text) override
     {
         printStringRaw(y, x, text, false);
     }
 
-    void printStringCenterAligned(int y, int x, std::string text) override
+    void printStringCenterAligned(int y, int x, const char *text) override
     {
         printStringRaw(y, x, text, true);
     }
@@ -131,18 +131,22 @@ public:
 
     std::string readInput(const char *title) override
     {
+        clear();
         echo();
         char input[256];
-        int x = (COLS - strlen(title)) / 2;
-        int y = LINES / 2 - 2;
-        mvprintw(y, x, "%s :", title);
-        mvprintw(y + 4, x, "Press enter to save ...");
-        mvprintw(y + 2, x, ">> ");
+        printStringCenterAligned(40, 50, title);
+        printStringCenterAligned(60, 50, "Press enter to save ...");
+        printStringCenterAligned(50, 50, ">> ");
         refresh();
         getstr(input);
         noecho();
         clear();
         return std::string(input);
+    }
+
+    int readInputChar() override
+    {
+        return getch();
     }
 };
 
